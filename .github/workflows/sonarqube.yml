@@ -33,4 +33,4 @@ jobs:
       - name: Execute Gradle build with SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --info
+        run: gradle sonar --info
