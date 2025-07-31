@@ -28,8 +28,9 @@ jobs:
       - name: Build and analyze
         run: |
           gradle build
-          gradle sonarqube \
+          gradle sonar \
             -Dsonar.projectKey=monikabole_devops-practice \
             -Dsonar.organization=monikabole \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.gradle.skipCompile=true
