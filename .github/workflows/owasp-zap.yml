@@ -7,9 +7,9 @@ on:
 
 permissions:
   contents: read
-  issues: write      # allows ZAP to open an Issue when warnings exist
+  issues: write
   actions: read
-  artifacts: write   # needed for upload-artifact@v4
+  artifacts: write
 
 jobs:
   zap_scan:
@@ -17,16 +17,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4          # (v4 is current)
+        uses: actions/checkout@v4
 
-      # ──────────────────────────────────────────────────────────
-      # Start or build your target application here.
-      # Example: simple static server on port 8080
-      - name: Start target app (example)
+      - name: Start example web app (for testing)
         run: |
           nohup python3 -m http.server 8080 &
-          sleep 15                       # give it time to boot
-      # ──────────────────────────────────────────────────────────
+          sleep 15
 
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.10.0
@@ -34,7 +30,6 @@ jobs:
           target: 'http://localhost:8080'
           cmd_options: '-J report_json.json -w report_md.md -r report_html.html'
 
-      # ─────── Upload scan reports (needs v4 now) ───────
       - name: Upload HTML report
         uses: actions/upload-artifact@v4
         with:
