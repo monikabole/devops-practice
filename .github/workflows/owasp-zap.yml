@@ -11,23 +11,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Docker network
         run: docker network create zap-net
 
-      - name: Start vulnerable app (Juice Shop)
+      - name: Run vulnerable web app container
         run: |
           docker run -d --rm \
-            --network zap-net \
             --name vulnerableweb \
-            -p 3000:3000 \
+            --network zap-net \
             bkimminich/juice-shop
 
-      - name: Wait for app to start
-        run: |
-          echo "Waiting for app to fully boot..."
-          sleep 30
+      - name: Wait for vulnerable app to start
+        run: sleep 30
 
       - name: Run OWASP ZAP Baseline Scan
         run: |
@@ -37,13 +34,18 @@ jobs:
             ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
               -t http://vulnerableweb:3000 \
               -r zap_report.html \
+              -l INFO \
               -d
         continue-on-error: true
 
       - name: Upload ZAP Scan Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: zap-report
+          name: zap_report
           path: zap_report.html
 
-
+      - name: Cleanup Docker
+        if: always()
+        run: |
+          docker stop vulnerableweb || true
+          docker network rm zap-net || true
