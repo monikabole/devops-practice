@@ -3,12 +3,13 @@ name: OWASP ZAP Baseline Scan
 on:
   push:
     branches:
-      - main  # Or your default branch
+      - main  # make sure this matches your default branch name
   workflow_dispatch:
 
+# ✅ Add correct permissions to allow issue creation
 permissions:
   contents: read
-  issues: write  # <-- Important!
+  issues: write  # <-- THIS FIXES THE ERROR
 
 jobs:
   zap_scan:
@@ -21,6 +22,6 @@ jobs:
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.10.0
         with:
-          target: 'http://localhost:8080'
+          target: 'http://localhost:8080'  # or your app URL
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
