@@ -24,22 +24,26 @@ jobs:
             -p 3000:3000 \
             bkimminich/juice-shop
 
-      - name: Wait for app to be ready
+      - name: Wait for app to start
         run: |
-          echo "Waiting for app to start..."
+          echo "Waiting for app to fully boot..."
           sleep 30
 
       - name: Run OWASP ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.10.0
-        with:
-          target: http://vulnerableweb:3000
-        env:
-          DOCKER_NETWORK: zap-net
+        run: |
+          docker run --rm \
+            --network zap-net \
+            -v ${{ github.workspace }}:/zap/wrk:rw \
+            ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+              -t http://vulnerableweb:3000 \
+              -r zap_report.html \
+              -d
         continue-on-error: true
 
       - name: Upload ZAP Scan Report
         uses: actions/upload-artifact@v4
         with:
           name: zap-report
-          path: report.html
+          path: zap_report.html
+
 
